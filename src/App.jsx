@@ -572,6 +572,32 @@ function TechnicalDetails() {
   );
 }
 
+function ModelLimitationsCard() {
+  return (
+    <motion.section
+      className="results-card model-limitations-card"
+      variants={fadeUp}
+      transition={{ duration: 0.55, delay: 0.36, ease: 'easeOut' }}
+    >
+      <header>
+        <AlertCircle />
+        <div>
+          <h2>Model Limitations</h2>
+        </div>
+      </header>
+      <p>
+        This model was trained on patient records with ages ranging from 30 to 65 years.
+        Predictions for patients outside this range may be less reliable because the model
+        has not observed many similar examples during training.
+      </p>
+      <p>
+        This application is intended for educational and demonstration purposes only and
+        should not be used for medical decision-making.
+      </p>
+    </motion.section>
+  );
+}
+
 function ResultsPage({ result, onNewAssessment }) {
   return (
     <PageChrome>
@@ -620,6 +646,7 @@ function ResultsPage({ result, onNewAssessment }) {
               purposes only. It is not medical advice.
             </p>
           </motion.section>
+          <ModelLimitationsCard />
           <motion.div className="results-actions" variants={fadeUp}>
             <button type="button" className="cta-button results-new-button" onClick={onNewAssessment}>
               <RotateCcw />
@@ -671,7 +698,7 @@ function AssessmentPage({ onBack, onPredictionSuccess }) {
     setIsSubmitting(true);
 
     const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 12000);
+    const timeoutId = window.setTimeout(() => controller.abort(), 65000);
 
     try {
       const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/predict`, {
@@ -818,6 +845,26 @@ function AssessmentPage({ onBack, onPredictionSuccess }) {
           </motion.div>
         </motion.form>
       </section>
+      {isSubmitting ? (
+        <motion.div
+          className="prediction-loading-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          role="status"
+          aria-live="assertive"
+          aria-label="Generating Risk Assessment"
+        >
+          <div className="prediction-loading-card">
+            <LoaderCircle className="prediction-loading-spinner" />
+            <h2>Generating Risk Assessment</h2>
+            <p>Running XGBoost inference and generating SHAP explanations...</p>
+            <span>
+              First request may take up to 60 seconds if the model server is waking from sleep.
+            </span>
+          </div>
+        </motion.div>
+      ) : null}
     </PageChrome>
   );
 }
