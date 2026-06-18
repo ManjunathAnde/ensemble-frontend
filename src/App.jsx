@@ -494,14 +494,19 @@ function ShapChart({ contributions }) {
         <BarChart3 />
         <div>
           <h2>Why Did The Model Predict This?</h2>
-          <p>SHAP values show how each feature influenced the prediction.</p>
+          <p>
+            SHAP values indicate how each feature influenced the model's internal score.
+            Positive values push the prediction toward higher risk, while negative values push
+            it toward lower risk. Bar lengths are scaled for visual comparison.
+          </p>
         </div>
       </header>
 
       <div className="shap-chart" role="list">
         {sortedContributions.map(([featureName, value], index) => {
           const isPositive = value >= 0;
-          const width = `${Math.max((Math.abs(value) / maxAbsValue) * 48, 4)}%`;
+          const normalizedWidth = Math.abs(value) / maxAbsValue;
+          const width = `${Math.max(normalizedWidth * 48, 4)}%`;
 
           return (
             <motion.div
@@ -523,7 +528,7 @@ function ShapChart({ contributions }) {
               </div>
               <span className={isPositive ? 'shap-value-positive' : 'shap-value-negative'}>
                 {value >= 0 ? '+' : ''}
-                {value.toFixed(2)}
+                {value.toFixed(4)}
               </span>
             </motion.div>
           );
